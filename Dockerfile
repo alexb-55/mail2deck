@@ -41,6 +41,9 @@ RUN docker-utils/install_composer.sh && \
 RUN docker-utils/configure_smtp.sh && \
     rm docker-utils/configure_smtp.sh
 
+# Set permissions for the attachment folder 
+RUN chown -R deckbot /home/deckbot/mail2deck/attachments
+
 # Use our non-root user
 USER deckbot
 
