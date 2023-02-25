@@ -3,6 +3,7 @@
 namespace Mail2Deck;
 
 use League\HTMLToMarkdown\HtmlConverter;
+use League\HTMLToMarkdown\Converter\TableConverter;
 
 class ConvertToMD {
     protected $html;
@@ -10,9 +11,12 @@ class ConvertToMD {
     public function __construct($html) {
         $this->converter = new HtmlConverter([
             'strip_tags' => true,
-            'remove_nodes' => 'title'
+            'remove_nodes' => 'title style'
         ]);
-        $this->html = $html;
+        $this->converter->getEnvironment()->addConverter(new TableConverter());
+        $html = str_ireplace('<div ', ' 
+<div ', $html);
+        $this->html =  str_ireplace('<p>', '<br><p> ', $html);
     }
 
     public function execute()
