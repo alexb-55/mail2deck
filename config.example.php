@@ -12,3 +12,5 @@ define("DECODE_SPECIAL_CHARACTERS", true); //requires mbstring, if false special
 define("ASSIGN_SENDER", true); // if true, sender will be assigned to card if has NC account
 define("MAIL_NOTIFICATION", true); // if true, send notifications when a new card was created or an error occured
 define("DELETE_MAIL_AFTER_PROCESSING", true);
+define("PREFIX_BOARD_NAME", '@');
+define("POSTFIX_BOARD_NAME", '@');

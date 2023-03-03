@@ -71,7 +71,7 @@ for ($j = 0; $j < count($emails) && $j < 5; $j++) {
     }
 
     $overview = $inbox->headerInfo($emails[$j]);
-    $board = null;
+    $board = NC_DECK_DEFAULT_PREFIX_BOARD.$overview->reply_to[0]->mailbox."@".$overview->reply_to[0]->host;
     if(isset($overview->{'X-Original-To'}) && strstr($overview->{'X-Original-To'}, '+')) {
         $board = strstr(substr($overview->{'X-Original-To'}, strpos($overview->{'X-Original-To'}, '+') + 1), '@', true);
     } else {
