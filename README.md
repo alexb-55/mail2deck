@@ -44,6 +44,11 @@ Here's how the email subject should look like:
 * *You can use single or double quotes.*
 * *Case-insensitive for board, stack and user respectively.*
 
+Or for faster and easier entry, specify your prefix and postfix in the configuration file for the board (For example, specify prefix='@' and postfix='@')
+
+`Update website logo @website@'
+`Update website logo @website@ s-'to do' u-'bob'`
+
 ### 2.4: Specify due date
 You can use the optional parameter `d-` to add a due date to a card.
 Here's how the email subject should look like if you want to set a due date to the card:
@@ -51,6 +56,8 @@ Here's how the email subject should look like if you want to set a due date to t
 `Update website logo b-'website' s-'to do' u-'bob' d-'2022-08-22T19:29:30+00:00'`
 
 * *You can use single or double quotes.*
+
+If no due data was specified and SET_DUETIME_CARD was commented out, the current date and time will be set, if SET_DUETIME_CARD was uncommented, the execution time set in this parameter, of the current day will be set. 
 
 # ⚙️ B. For NextCloud admins to setup
 ## Requirements
@@ -89,9 +96,43 @@ Add the following line in the opened file (in this example, it runs every 5 minu
 <code>*/5 * * * * /usr/bin/php /home/incoming/mail2deck/index.php >/dev/null 2>&1</code>
 
 ### Docker installation
+### Option 1 - Pull from [Docker Hub](https://hub.docker.com/r/alexb55/mail2deck)
+Download image
+```
+docker pull alexb55/mail2deck
+```
+
+Create a file on your host
+```
+nano config.php
+```
+To configure it, create a config.php file ([Example](https://hub.docker.com/r/alexb55/mail2deck))
+
+
+Run the docker image with your DNS and your PATH to the host where the configuration file created above is located. 
+```
+docker run --dns=192.168.1.1 -d --network host --name mail2deck  -v /YOUR_PATH/config.php:/home/deckbot/mail2deck/config.php alexb55/mail2deck:latest
+```
+
+Edit your crontab
+```
+crontab -e
+```
+
+And add this line
+```
+*/1 * * * *  docker start mail2deck
+```
+
+Finish
+
+Now __mail2deck__ will add new cards every one minutes if new emails are received.
+
+
+### Option 2 - Clone, Build, Run
 Clone and edit the config.example.php you find in this repository and move it as config.php
 ```
-git clone https://github.com/newroco/mail2deck.git mail2deck
+git clone https://github.com/alexb55/mail2deck.git mail2deck
 cd mail2deck
 cp config.example.php config.php
 nano config.php
