@@ -13,6 +13,7 @@ Deck Bot must be assigned and must have edit permission inside the board.
 Let's assume you want to add a card with title "Update website logo" on board "Website" and stack "To do".
 You can do this in two ways.
 
+
 ### 2.1: Set stack and board in the email subject
 Here's how the email subject should look like:
 <code>Update website logo b-'website' s-'to do'</code>
@@ -20,6 +21,9 @@ Here's how the email subject should look like:
 * *You can use single or double quotes.*
 
 * *Case-insensitive for board and stack respectively.*
+
+Or for faster and easier entry, specify your prefix and postfix in the config file(For example, specify prefix='@' and postfix='@')
+<code>Update website logo @website@ s-'to do'</code>
 
 ### 2.2: Set the board in the email address
 At the end of the email address prefix (before @) add "+website"
@@ -44,10 +48,8 @@ Here's how the email subject should look like:
 * *You can use single or double quotes.*
 * *Case-insensitive for board, stack and user respectively.*
 
-Or for faster and easier entry, specify your prefix and postfix in the configuration file for the board (For example, specify prefix='@' and postfix='@')
-
-`Update website logo @website@'
-`Update website logo @website@ s-'to do' u-'bob'`
+Or for faster and easier entry, specify your prefix and postfix in the config file(For example, specify prefix='@' and postfix='@')
+<code>Update website logo @website@ s-'to do' u-'bob'</code>
 
 ### 2.4: Specify due date
 You can use the optional parameter `d-` to add a due date to a card.
@@ -57,7 +59,22 @@ Here's how the email subject should look like if you want to set a due date to t
 
 * *You can use single or double quotes.*
 
+Or for faster and easier entry, specify your prefix and postfix in the config file(For example, specify prefix='@' and postfix='@')
+<code>Update website logo @website@ s-'to do' u-'bob' d-'2022-08-22T19:29:30+00:00'`</code>
+
 If no due data was specified and SET_DUETIME_CARD was commented out, the current date and time will be set, if SET_DUETIME_CARD was uncommented, the execution time set in this parameter, of the current day will be set. 
+
+### 2.5 Set board in the email subject
+Here's how the email subject should look like:
+<code>Update website logo b-'website'</code>
+
+* *You can use single or double quotes.*
+
+* *Case-insensitive for board and stack respectively.*
+
+Or for faster and easier entry, specify your prefix and postfix in the config file(For example, specify prefix='@' and postfix='@')
+
+<code>`Update website logo @website@'</code>
 
 # ⚙️ B. For NextCloud admins to setup
 ## Requirements
@@ -79,7 +96,7 @@ This could be any hosted email service. The only requirement is that you can con
 If using a self-hosted Postfix server, clone this repository into the home directory of the *incoming* user. If not self-hosting, you may need to create a new user on your system and adjust the commands in future steps to match that username.<br>
 ```
 su - incoming
-git clone https://github.com/newroco/mail2deck.git mail2deck
+git clone https://github.com/alexb55/mail2deck.git mail2deck
 ```
 Create config.php file and edit it for your needs: 
 ```
