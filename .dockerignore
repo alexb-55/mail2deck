@@ -4,6 +4,7 @@
 # Allow files and directories
 !lib/
 !docker-utils/
+!attachments/
 !composer*
 !config*
 !index.php
