@@ -41,6 +41,9 @@ RUN docker-utils/install_composer.sh && \
 RUN docker-utils/configure_smtp.sh && \
     rm docker-utils/configure_smtp.sh
 
+# Creating an attachments folder 
+RUN mkdir /home/deckbot/mail2deck/attachments
+
 # Set permissions for the attachment folder 
 RUN chown -R deckbot /home/deckbot/mail2deck/attachments
 
