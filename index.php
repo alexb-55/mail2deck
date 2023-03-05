@@ -45,6 +45,7 @@ for ($j = 0; $j < count($emails) && $j < 5; $j++) {
                 // $attachments[$i]['attachment'] = $inbox->fetchMessageBody($emails[$j], $i+1);
                  $attachments[$i]['attachment'] = $inbox->_encodeText($inbox->fetchMessageBody($emails[$j], $i+1),$structure->parts[$i]->encoding);
              }
+        }
     }
     for ($i = 1; $i <= count($attachments); $i++) {
         if(! file_exists(getcwd() . '/attachments')) {

@@ -163,7 +163,7 @@ class DeckClass {
 
         foreach($boardUsers as $user) {
                 $boardUser->userId = $user;
-                $this->apiCall("PUT", NC_SERVER . "/index.php/apps/deck/api/v1.0/boards/{$card->board}/stacks/{$card->stack}/cards/{$card->id}/assignUser",  $board>
+                $this->apiCall("PUT", NC_SERVER . "/index.php/apps/deck/api/v1.0/boards/{$card->board}/stacks/{$card->stack}/cards/{$card->id}/assignUser", $boardUser);
         }
     }
 
