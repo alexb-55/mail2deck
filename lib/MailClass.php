@@ -28,6 +28,53 @@ class MailClass {
         return imap_fetchbody($this->inbox, $email, $section);
     }
 
+    public function fetchMessageBody2($email) {
+        $body = $this->get_part($this->inbox, imap_uid($this->inbox, $email), "TEXT/HTML");
+        // if PLAIN body is empty, try getting HTML
+        if ($body == "") {
+          $body = $this->get_part($this->inbox, imap_uid($this->inbox, $email), "TEXT/PLAIN");
+        }
+        return $body;
+      }
+
+    function get_part($imap, $uid, $mimetype, $structure = false, $partNumber = false) {
+        if (!$structure) {
+           $structure = imap_fetchstructure($imap, $uid, FT_UID);
+        }
+        if ($structure) {
+            if ($mimetype == $this->get_mime_type($structure)) {
+                if (!$partNumber) {
+                    $partNumber = 1;
+                }
+                return $this->_encodeText(imap_fetchbody($imap, $uid, $partNumber, FT_UID), $structure->encoding);
+            }
+ 
+            // multipart
+            if ($structure->type == 1) {
+                foreach ($structure->parts as $index => $subStruct) {
+                    $prefix = "";
+                    if ($partNumber) {
+                        $prefix = $partNumber . ".";
+                    }
+                    $data = $this->get_part($imap, $uid, $mimetype, $subStruct, $prefix. ($index + 1));
+                    if ($data) {
+                        return $data;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    function get_mime_type($structure) {
+        $primaryMimetype = array("TEXT", "MULTIPART", "MESSAGE", "APPLICATION", "AUDIO", "IMAGE", "VIDEO", "OTHER");
+ 
+        if ($structure->subtype) {
+           return $primaryMimetype[(int)$structure->type] . "/" . $structure->subtype;
+        }
+        return "TEXT/PLAIN";
+    }
+
     public function headerInfo($email) {
         $headerInfo = imap_headerinfo($this->inbox, $email);
         $additionalHeaderInfo = imap_fetchheader($this->inbox, $email);
@@ -44,6 +91,30 @@ class MailClass {
         }
 
         return $headerInfo;
+    }
+
+    public function _encodeText($text, $type) {
+        if ($type == ENC7BIT) {#0
+                //return  mb_convert_encoding($text, "UTF-8", "auto");
+                return  $text;
+        } else if ($type == ENC8BIT) {#1
+                //return imap_8bit($text);
+                return quoted_printable_decode(imap_8bit($text));
+        } else if ($type == ENCBINARY) {#2
+                //return imap_base64(imap_binary($text));
+                return imap_binary($text);
+        } else if ($type == ENCBASE64) {#3
+                return imap_base64($text);
+        } else if ($type == ENCQUOTEDPRINTABLE) {#4
+                return imap_qprint($text);
+                //return quoted_printable_decode($text);
+        } else if ($type == ENCOTHER) {#5
+                return  $text;
+        } else {#UNKNOW
+                //return trim(utf8_encode(quoted_printable_decode(imap_qprint($text))));
+                //return imap_qprint($text);
+                return $text;
+        }
     }
 
     public function reply($sender, $response = null) {

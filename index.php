@@ -18,10 +18,7 @@ if(!$emails) {
 
 for ($j = 0; $j < count($emails) && $j < 5; $j++) {
     $structure = $inbox->fetchMessageStructure($emails[$j]);
-    $base64encode = false;
-    if($structure->encoding == 3) {
-        $base64encode = true; // BASE64
-    }
+    $flagParts = false;
     $attachments = array();
     $attNames = array();
     if (isset($structure->parts) && count($structure->parts)) {
@@ -30,7 +27,7 @@ for ($j = 0; $j < count($emails) && $j < 5; $j++) {
                 foreach ($structure->parts[$i]->dparameters as $object) {
                     if (strtolower($object->attribute) == 'filename') {
                         $attachments[$i]['is_attachment'] = true;
-                        $attachments[$i]['filename'] = $object->value;
+                        $attachments[$i]['filename'] = iconv_mime_decode($object->value,0,"UTF-8");
                     }
                 }
             }
@@ -39,21 +36,15 @@ for ($j = 0; $j < count($emails) && $j < 5; $j++) {
                 foreach ($structure->parts[$i]->parameters as $object) {
                     if (strtolower($object->attribute) == 'name') {
                         $attachments[$i]['is_attachment'] = true;
-                        $attachments[$i]['name'] = $object->value;
+                        $attachments[$i]['name'] = iconv_mime_decode($object->value,0,"UTF-8");
                     }
                 }
             }
 
-            if ($attachments[$i]['is_attachment']) {
-                $attachments[$i]['attachment'] = $inbox->fetchMessageBody($emails[$j], $i+1);
-                if ($structure->parts[$i]->encoding == 3) { // 3 = BASE64
-                    $attachments[$i]['attachment'] = base64_decode($attachments[$i]['attachment']);
-                }
-                elseif ($structure->parts[$i]->encoding == 4) { // 4 = QUOTED-PRINTABLE
-                    $attachments[$i]['attachment'] = quoted_printable_decode($attachments[$i]['attachment']);
-                }
-            }
-        }
+            if (isset($attachments[$i]['is_attachment'])&&($attachments[$i]['is_attachment'])) {
+                // $attachments[$i]['attachment'] = $inbox->fetchMessageBody($emails[$j], $i+1);
+                 $attachments[$i]['attachment'] = $inbox->_encodeText($inbox->fetchMessageBody($emails[$j], $i+1),$structure->parts[$i]->encoding);
+             }
     }
     for ($i = 1; $i <= count($attachments); $i++) {
         if(! file_exists(getcwd() . '/attachments')) {
@@ -78,27 +69,29 @@ for ($j = 0; $j < count($emails) && $j < 5; $j++) {
         if(strstr($overview->to[0]->mailbox, '+')) {
             $board = substr($overview->to[0]->mailbox, strpos($overview->to[0]->mailbox, '+') + 1);
         }
-    };
+    }
 
     if(strstr($board, '+')) $board = str_replace('+', ' ', $board);
 
     $data = new stdClass();
-    $data->title = DECODE_SPECIAL_CHARACTERS ? mb_decode_mimeheader($overview->subject) : $overview->subject;
+    $data->title = DECODE_SPECIAL_CHARACTERS ? imap_utf8($overview->subject) : $overview->subject;
     $data->type = "plain";
     $data->order = -time();
-    $body = $inbox->fetchMessageBody($emails[$j], 1.1);
-    if ($body == "") {
+    //$body = $inbox->fetchMessageBody($emails[$j], 1.1);
+    $description = $inbox->fetchMessageBody2($emails[$j]);
+
+    /*if ($body == "") {
         $body = $inbox->fetchMessageBody($emails[$j], 1);
-    }
+    }*/
     if(count($attachments)) {
         $data->attachments = $attNames;
-        $description = DECODE_SPECIAL_CHARACTERS ? quoted_printable_decode($body) : $body;
-    } else {
+        //$description = DECODE_SPECIAL_CHARACTERS ? quoted_printable_decode($body) : $body;
+    }/* else {
         $description = DECODE_SPECIAL_CHARACTERS ? quoted_printable_decode($body) : $body;
     }
     if($base64encode) {
         $description = base64_decode($description);
-    }
+    }*/
     if($description != strip_tags($description)) {
         $description = (new ConvertToMD($description))->execute();
     }
